@@ -43,4 +43,9 @@ public class Asignacion {
 	public Empleado getEmpleado() {
 		return empleado;
 	}
+
+	/** Total de envases de la asignación expresado en toneladas (según la planta). */
+	public float getTotalToneladas() {
+		return planta.envasesAToneladas(totalEnvases);
+	}
 }

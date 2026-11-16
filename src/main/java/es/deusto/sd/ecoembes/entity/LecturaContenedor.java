@@ -9,12 +9,12 @@ public class LecturaContenedor {
 
 	private LocalDate fecha;
 	private int numEnvases;
-	private NivelLlenado nivelLlenado;
+	private NivelLlenado llenado;
 
-	public LecturaContenedor(LocalDate fecha, int numEnvases, NivelLlenado nivelLlenado) {
+	public LecturaContenedor(LocalDate fecha, int numEnvases, NivelLlenado llenado) {
 		this.fecha = fecha;
 		this.numEnvases = numEnvases;
-		this.nivelLlenado = nivelLlenado;
+		this.llenado = llenado;
 	}
 
 	public LocalDate getFecha() {
@@ -25,7 +25,7 @@ public class LecturaContenedor {
 		return numEnvases;
 	}
 
-	public NivelLlenado getNivelLlenado() {
-		return nivelLlenado;
+	public NivelLlenado getLlenado() {
+		return llenado;
 	}
 }

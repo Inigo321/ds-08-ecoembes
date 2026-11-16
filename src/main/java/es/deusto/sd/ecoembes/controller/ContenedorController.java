@@ -21,7 +21,6 @@ import es.deusto.sd.ecoembes.dto.EstadoContenedorDTO;
 import es.deusto.sd.ecoembes.dto.NuevoContenedorDTO;
 import es.deusto.sd.ecoembes.entity.Contenedor;
 import es.deusto.sd.ecoembes.entity.LecturaContenedor;
-import es.deusto.sd.ecoembes.entity.NivelLlenado;
 import es.deusto.sd.ecoembes.service.AuthService;
 import es.deusto.sd.ecoembes.service.ContenedorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -103,15 +102,19 @@ public class ContenedorController {
 	public ResponseEntity<Void> actualizarEstadoContenedor(
 			@Parameter(description = "Identificador del contenedor", required = true) @PathVariable("idContenedor") String idContenedor,
 			@Parameter(description = "Número estimado de envases", required = true) @RequestParam("numEnvases") int numEnvases,
-			@Parameter(description = "Nivel de llenado", required = true) @RequestParam("nivelLlenado") NivelLlenado nivelLlenado) {
+			@Parameter(description = "Nivel de llenado (VERDE, NARANJA o ROJO)", required = true) @RequestParam("nivelLlenado") String nivelLlenado) {
 		if (numEnvases < 0) {
 			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 
-		if (contenedorService.actualizarEstado(idContenedor, numEnvases, nivelLlenado)) {
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+		try {
+			if (contenedorService.actualizarEstado(idContenedor, numEnvases, nivelLlenado)) {
+				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+			} else {
+				return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+			}
+		} catch (IllegalArgumentException e) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // nivel de llenado no válido
 		}
 	}
 
@@ -144,7 +147,7 @@ public class ContenedorController {
 		List<EstadoContenedorDTO> dtos = new ArrayList<>();
 
 		for (LecturaContenedor l : lecturas) {
-			dtos.add(new EstadoContenedorDTO(l.getFecha(), l.getNumEnvases(), l.getNivelLlenado().name()));
+			dtos.add(new EstadoContenedorDTO(l.getFecha(), l.getNumEnvases(), l.getLlenado().name()));
 		}
 
 		return new ResponseEntity<>(dtos, HttpStatus.OK);
@@ -175,7 +178,7 @@ public class ContenedorController {
 	// Conversión de entidad a DTO (la realiza la fachada)
 	private ContenedorDTO contenedorToDTO(Contenedor c, LecturaContenedor lectura) {
 		return new ContenedorDTO(c.getId(), c.getDireccion(), c.getCodigoPostal(), c.getCapacidad(),
-				lectura.getFecha(), lectura.getNumEnvases(), lectura.getNivelLlenado().name());
+				lectura.getFecha(), lectura.getNumEnvases(), lectura.getLlenado().name());
 	}
 
 	private boolean esVacio(String texto) {

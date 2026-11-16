@@ -10,16 +10,16 @@ public class CapacidadPlantaDTO {
 	private String idPlanta;
 	private String nombre;
 	private LocalDate fecha;
-	private float capacidadDisponible;
+	private float capacidad;
 
 	public CapacidadPlantaDTO() {
 	}
 
-	public CapacidadPlantaDTO(String idPlanta, String nombre, LocalDate fecha, float capacidadDisponible) {
+	public CapacidadPlantaDTO(String idPlanta, String nombre, LocalDate fecha, float capacidad) {
 		this.idPlanta = idPlanta;
 		this.nombre = nombre;
 		this.fecha = fecha;
-		this.capacidadDisponible = capacidadDisponible;
+		this.capacidad = capacidad;
 	}
 
 	public String getIdPlanta() {
@@ -46,11 +46,11 @@ public class CapacidadPlantaDTO {
 		this.fecha = fecha;
 	}
 
-	public float getCapacidadDisponible() {
-		return capacidadDisponible;
+	public float getCapacidad() {
+		return capacidad;
 	}
 
-	public void setCapacidadDisponible(float capacidadDisponible) {
-		this.capacidadDisponible = capacidadDisponible;
+	public void setCapacidad(float capacidad) {
+		this.capacidad = capacidad;
 	}
 }

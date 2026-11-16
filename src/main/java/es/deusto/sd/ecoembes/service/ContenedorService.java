@@ -76,15 +76,20 @@ public class ContenedorService {
 		return contenedores.get(id);
 	}
 
-	/** Actualización diaria enviada por el sensor. Devuelve false si el contenedor no existe. */
-	public boolean actualizarEstado(String id, int numEnvases, NivelLlenado nivelLlenado) {
+	/**
+	 * Actualización diaria enviada por el sensor. Devuelve false si el contenedor no existe.
+	 *
+	 * @throws IllegalArgumentException si el nivel de llenado no es VERDE, NARANJA o ROJO
+	 */
+	public boolean actualizarEstado(String id, int numEnvases, String nivelLlenado) {
 		Contenedor contenedor = contenedores.get(id);
 
 		if (contenedor == null) {
 			return false;
 		}
 
-		contenedor.addLectura(new LecturaContenedor(LocalDate.now(), numEnvases, nivelLlenado));
+		NivelLlenado llenado = NivelLlenado.valueOf(nivelLlenado.toUpperCase());
+		contenedor.addLectura(new LecturaContenedor(LocalDate.now(), numEnvases, llenado));
 		return true;
 	}
 

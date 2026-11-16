@@ -23,7 +23,7 @@ import es.deusto.sd.ecoembes.entity.PlantaReciclaje;
 public class PlantaService {
 
 	// Peso medio estimado de un envase en toneladas (50 g) para comparar envases con la capacidad
-	private static final float PESO_ENVASE_TONELADAS = 0.00005f;
+	private float pesoEnvaseToneladas = 0.00005f;
 
 	// Repositorio simulado de plantas: id -> planta
 	private Map<String, PlantaReciclaje> plantas = new LinkedHashMap<>();
@@ -37,8 +37,8 @@ public class PlantaService {
 		this.contenedorService = contenedorService;
 
 		// Datos de prueba: capacidad de hoy y de los 10 días siguientes
-		PlantaReciclaje plasSB = new PlantaReciclaje("PlasSB", "PlasSB Ltd.");
-		PlantaReciclaje contSocket = new PlantaReciclaje("ContSocket", "ContSocket Ltd.");
+		PlantaReciclaje plasSB = new PlantaReciclaje("PlasSB", "PlasSB Ltd.", pesoEnvaseToneladas);
+		PlantaReciclaje contSocket = new PlantaReciclaje("ContSocket", "ContSocket Ltd.", pesoEnvaseToneladas);
 		LocalDate hoy = LocalDate.now();
 
 		for (int i = 0; i <= 10; i++) {
@@ -72,14 +72,14 @@ public class PlantaService {
 	 * @throws IllegalArgumentException si los datos no son válidos o no hay capacidad para esa fecha
 	 * @throws IllegalStateException    si la planta no tiene capacidad suficiente
 	 */
-	public Asignacion asignarContenedores(String idPlanta, LocalDate fecha, List<String> idsContenedores, Empleado empleado) {
+	public Asignacion asignarContenedores(String idPlanta, LocalDate fecha, List<String> idContenedores, Empleado empleado) {
 		PlantaReciclaje planta = plantas.get(idPlanta);
 
 		if (planta == null) {
 			throw new NoSuchElementException("No existe la planta " + idPlanta);
 		}
 
-		if (fecha == null || idsContenedores == null || idsContenedores.isEmpty()) {
+		if (fecha == null || idContenedores == null || idContenedores.isEmpty()) {
 			throw new IllegalArgumentException("Hay que indicar la fecha y al menos un contenedor");
 		}
 
@@ -92,7 +92,7 @@ public class PlantaService {
 		List<Contenedor> contenedores = new ArrayList<>();
 		int totalEnvases = 0;
 
-		for (String id : idsContenedores) {
+		for (String id : idContenedores) {
 			Contenedor contenedor = contenedorService.getContenedor(id);
 
 			if (contenedor == null) {
@@ -107,15 +107,14 @@ public class PlantaService {
 			totalEnvases += contenedor.getUltimaLectura().getNumEnvases();
 		}
 
-		float toneladas = totalEnvases * PESO_ENVASE_TONELADAS;
+		Asignacion asignacion = new Asignacion(fecha, planta, contenedores, totalEnvases, empleado);
+		float toneladas = asignacion.getTotalToneladas();
 
 		if (toneladas > capacidad) {
 			throw new IllegalStateException("La planta no tiene capacidad suficiente");
 		}
 
 		planta.setCapacidad(fecha, capacidad - toneladas);
-
-		Asignacion asignacion = new Asignacion(fecha, planta, contenedores, totalEnvases, empleado);
 		asignaciones.add(asignacion);
 
 		notificarPlanta(asignacion);
